@@ -1,13 +1,23 @@
 from django.contrib import admin
 
 # Register your models here.
-from jobs.models import Job, JobCategory
+from jobs.models import Job, JobCategory, Location
 
 
 class JobCategoryAdmin(admin.ModelAdmin):
     save_as = True
     search_fields = ['name']
     search_help_text = 'Search by job category name'
+    sortable_by = ['name']
+    view_on_site = True
+
+    list_display = ('name', 'id', 'description')
+
+
+class LocationAdmin(admin.ModelAdmin):
+    save_as = True
+    search_fields = ['name']
+    search_help_text = 'Search by location name'
     sortable_by = ['name']
     view_on_site = True
 
@@ -22,8 +32,9 @@ class JobAdmin(admin.ModelAdmin):
     view_on_site = True
 
     list_display = (
-        'title', 'id', 'location', 'published_date', 'vacancy_count', 'job_nature', 'salary_start', 'salary_end')
+        'title', 'id', 'published_date', 'vacancy_count', 'job_nature', 'salary_start', 'salary_end')
 
 
 admin.site.register(Job, JobAdmin)
 admin.site.register(JobCategory, JobCategoryAdmin)
+admin.site.register(Location, LocationAdmin)
