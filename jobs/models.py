@@ -44,10 +44,20 @@ class Job(models.Model):
     salary_end = models.PositiveIntegerField(default=0)
     company_detail = HTMLField()
     logo = models.ImageField(upload_to='images/', null=True, blank=True)
-
     categories = models.ManyToManyField(JobCategory, related_name='jobs')
-    locations = models.ManyToManyField(Location, related_name='jobs')
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
 
+
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    photo = models.ImageField(upload_to='images/', null=True, blank=True)
+    description = models.TextField()
+    content = HTMLField()
+    published_date = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
 
 def on_job_created(sender, instance, created, **kwargs):
     if created:

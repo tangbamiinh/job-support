@@ -4,7 +4,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.generic import ListView, TemplateView
 
-from jobs.models import Job, JobCategory, Location
+from jobs.models import Job, JobCategory, Location, Post
 
 
 def index(request):
@@ -14,8 +14,8 @@ def index(request):
 
     return render(request, 'index.html', {
         'featured_job_list': jobs,
-        # 'full_time_job_list': jobs.filter(job_nature='FULL_TIME'),
-        # 'part_time_job_list': jobs.filter(job_nature='PART_TIME'),
+        'full_time_job_list': jobs,
+        'part_time_job_list': jobs,
         'job_categories': job_categories,
         'locations': locations,
     })
@@ -34,12 +34,14 @@ def job_detail(request, job_id: int):
     return render(request, 'job-detail.html', {'title': 'Job Detail', 'job': job})
 
 
-def job_list(request, keyword: str = None):
-    if keyword:
-        jobs = Job.objects.filter(title__icontains=keyword)
-    else:
-        jobs = Job.objects.all()
-    return render(request, 'job-list.html', {'title': 'Job List', 'job_list': jobs})
+def job_list(request):
+    jobs = Job.objects.all()
+    return render(request, 'job-list.html', {
+        'title': 'Job List',
+        'featured_job_list': jobs,
+        'full_time_job_list': jobs,
+        'part_time_job_list': jobs,
+    })
 
 
 class JobSearchResultsView(ListView):
@@ -59,9 +61,9 @@ class JobSearchResultsView(ListView):
         else:
             queryset = Job.objects.all()
 
-        if location_id:
-            queryset = queryset.filter(locations__id=location_id)
-        if category_id and category_id != '0':
+        if location_id and location_id != '-1':
+            queryset = queryset.filter(location__id=location_id)
+        if category_id and category_id != '-1':
             queryset = queryset.filter(categories__id=category_id)
 
         return queryset
@@ -70,7 +72,11 @@ class JobSearchResultsView(ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Job Search Results'
 
-        print(context)
+        job_categories = JobCategory.objects.all()
+        locations = Location.objects.all()
+
+        context['job_categories'] = job_categories
+        context['locations'] = locations
         return context
 
 
@@ -81,11 +87,19 @@ def category_list(request):
 
 def category_detail(request, category_id: int):
     job_category = JobCategory.objects.get(id=category_id)
-    print(job_category)
     jobs = job_category.jobs.all()
-    print(len(jobs))
     return render(request, 'category-detail.html',
                   {'title': f'Category: {job_category.name}', 'job_category': job_category, 'job_list': jobs})
+
+
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'post-list.html', {'title': 'News', 'post_list': posts})
+
+
+def post_detail(request, post_id: int):
+    post = Post.objects.get(id=post_id)
+    return render(request, 'post-detail.html', {'title': post.title, 'post': post})
 
 
 def testimonial(request):

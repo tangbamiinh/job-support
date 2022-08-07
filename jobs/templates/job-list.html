@@ -4,8 +4,9 @@
 
 {% block content_with_header %}
 
+    {% include 'components/search_bar.html' %}
     <!-- Jobs Start -->
-    {% include 'components/job_list_container.html' %}
+    {% include 'components/job_list.html' %}
     <!-- Jobs End -->
 
 {% endblock %}
